@@ -1,4 +1,4 @@
-package com.sysmap.srcmssignportability.framework.adapters.in;
+package com.sysmap.srcmssignportability.framework.adapters.in.services;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
