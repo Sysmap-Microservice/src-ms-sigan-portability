@@ -13,14 +13,20 @@ public class SignPortabilityServiceImpl implements SignPortabilityService {
         Gson gson = new Gson();
         PortabilityInputKafka portabilityInputKafka = gson.fromJson(messageKafka, PortabilityInputKafka.class);
 
+        StatusPortability statusPortability = getStatusPortability(portabilityInputKafka);
+
+    }
+
+    private StatusPortability getStatusPortability(PortabilityInputKafka portabilityInputKafka) {
         StatusPortability statusPortability = StatusPortability.UNPORTED;
 
         if (portabilityInputKafka.getNumber().length() == 9
-                && portabilityInputKafka.getPortability().getSource() == CellPhoneOperator.VIVO
-                && portabilityInputKafka.getPortability().getTarget() != CellPhoneOperator.VIVO) {
+                && portabilityInputKafka.getPortability().getSource().equals(CellPhoneOperator.VIVO)
+                && !portabilityInputKafka.getPortability().getTarget().equals(CellPhoneOperator.VIVO)) {
             statusPortability = StatusPortability.PORTED;
         }
 
+        return statusPortability;
     }
 
 }
