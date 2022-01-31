@@ -1,5 +1,6 @@
 package com.sysmap.srcmssignportability.framework.adapters.in.services;
 
+import com.sysmap.srcmssignportability.application.ports.in.KafkaConsumerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -10,7 +11,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class KafkaConsumerServiceImpl {
+public class KafkaConsumerServiceImpl implements KafkaConsumerService {
 
     @Value("${cloudkarafka.topic}")
     private String topicName;
