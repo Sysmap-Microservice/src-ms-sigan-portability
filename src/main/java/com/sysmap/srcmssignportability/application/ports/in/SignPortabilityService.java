@@ -4,4 +4,5 @@ public interface SignPortabilityService {
 
     void savePortabilityInfo(String messageKafka);
 
+    String callback();
 }
