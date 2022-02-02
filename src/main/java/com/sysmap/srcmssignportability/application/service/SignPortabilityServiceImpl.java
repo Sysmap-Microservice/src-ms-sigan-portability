@@ -38,23 +38,15 @@ public class SignPortabilityServiceImpl implements SignPortabilityService {
             statusPortability = StatusPortability.PORTED;
         }
 
-        var responseDefaultDto = this.portabilityFeignClient.callback("A portabilidade foi concluida").getBody();
+        logger.info("Enviando Callback.");
+        var responseDefaultDto = portabilityFeignClient.callback("SignPortability: A portabilidade foi concluida com sucesso!").getBody();
         if(responseDefaultDto.isEmpty()){
             logger.error("Falha ao enviar um callback!");
             throw new PortabilityNotFound("Falha ao enviar um callback!");
         }
+        logger.info("Callback enviado.");
+        logger.info(responseDefaultDto);
 
         return statusPortability;
     }
-
-    @Override
-    public String callback() {
-        var responseDefaultDto = this.portabilityFeignClient.callback("A portabilidade foi concluida").getBody();
-        if(responseDefaultDto.isEmpty()){
-            logger.error("Falha");
-            throw new PortabilityNotFound("Falha");
-        }
-        return responseDefaultDto;
-    }
-
 }

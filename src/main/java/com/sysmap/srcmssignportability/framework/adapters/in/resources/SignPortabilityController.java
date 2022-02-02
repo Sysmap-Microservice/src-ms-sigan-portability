@@ -17,10 +17,4 @@ public class SignPortabilityController {
     public SignPortabilityController(SignPortabilityService signPortabilityService) {
         this.signPortabilityService = signPortabilityService;
     }
-
-    @PostMapping
-    public ResponseEntity<String> callback(){
-        return ResponseEntity.ok(signPortabilityService.callback());
-    }
-
 }
