@@ -7,7 +7,9 @@ import lombok.Data;
 public class PortabilityInputKafka {
 
     private String number;
+
     private String documentNumber;
+
     private Portability portability;
 
 }
