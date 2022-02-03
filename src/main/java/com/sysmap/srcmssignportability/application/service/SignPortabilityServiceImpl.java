@@ -8,6 +8,8 @@ import com.sysmap.srcmssignportability.framework.adapters.in.dto.PortabilityInpu
 
 public class SignPortabilityServiceImpl implements SignPortabilityService {
 
+    StatusPortability statusPortability = StatusPortability.UNPORTED;
+
     @Override
     public void savePortabilityInfo(String messageKafka) {
         Gson gson = new Gson();
@@ -18,7 +20,6 @@ public class SignPortabilityServiceImpl implements SignPortabilityService {
     }
 
     private StatusPortability getStatusPortability(PortabilityInputKafka portabilityInputKafka) {
-        StatusPortability statusPortability = StatusPortability.UNPORTED;
 
         if (portabilityInputKafka.getNumber().length() == 9
                 && portabilityInputKafka.getPortability().getSource().equals(CellPhoneOperator.VIVO)
@@ -29,4 +30,7 @@ public class SignPortabilityServiceImpl implements SignPortabilityService {
         return statusPortability;
     }
 
+    public StatusPortability getStatusPortability() {
+        return this.statusPortability;
+    }
 }
