@@ -13,21 +13,16 @@ import lombok.extern.slf4j.Slf4j;
 public class SignPortabilityServiceImpl implements SignPortabilityService {
 
     private final PortabilityRepository portabilityRepository;
+    private StatusPortability statusPortability = StatusPortability.UNPORTED;
 
     public SignPortabilityServiceImpl(PortabilityRepository portabilityRepository) {
         this.portabilityRepository = portabilityRepository;
     }
 
-    StatusPortability statusPortability = StatusPortability.UNPORTED;
-
     @Override
-    public void savePortabilityInfo(String messageKafka) {
-        Gson gson = new Gson();
+    public Portability savePortabilityInfo(String messageKafka) {
 
-        var portabilityInputKafka = gson
-                .fromJson(messageKafka, PortabilityInputKafka.class);
-
-        var statusPortability = getStatusPortability(portabilityInputKafka);
+        var portabilityInputKafka = preparePortabilityForSaving(messageKafka);
 
         var request = Portability.builder()
                 .documentNumber(portabilityInputKafka.getDocumentNumber())
@@ -39,10 +34,22 @@ public class SignPortabilityServiceImpl implements SignPortabilityService {
                 .build();
 
         portabilityRepository.savePortability(request);
+
+        return request;
     }
 
-    private StatusPortability getStatusPortability(PortabilityInputKafka portabilityInputKafka) {
-        StatusPortability statusPortability = StatusPortability.UNPORTED;
+    public PortabilityInputKafka preparePortabilityForSaving(String messageKafka) {
+        Gson gson = new Gson();
+
+        var portabilityInputKafka = gson
+                .fromJson(messageKafka, PortabilityInputKafka.class);
+
+        statusPortability = validadeIfPorted(portabilityInputKafka);
+
+        return portabilityInputKafka;
+    }
+
+    private StatusPortability validadeIfPorted(PortabilityInputKafka portabilityInputKafka) {
 
         if (portabilityInputKafka.getNumber().length() == 9
                 && portabilityInputKafka.getPortability().getSource().equals(CellPhoneOperator.VIVO)
