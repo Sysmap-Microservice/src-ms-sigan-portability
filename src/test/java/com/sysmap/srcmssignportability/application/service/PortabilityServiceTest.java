@@ -1,11 +1,6 @@
 package com.sysmap.srcmssignportability.application.service;
 
-import com.sysmap.srcmssignportability.domain.enums.StatusPortability;
-import com.sysmap.srcmssignportability.framework.adapters.in.dto.PortabilityInputKafka;
-import org.junit.Assert;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import static org.junit.Assert.assertEquals;
 
 public class PortabilityServiceTest {

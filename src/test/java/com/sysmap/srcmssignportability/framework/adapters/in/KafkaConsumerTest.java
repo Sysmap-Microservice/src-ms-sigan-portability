@@ -108,7 +108,7 @@ class KafkaConsumerTest {
 	@Test
 	public void verifyWrongTopicAlreadyInRemoteKafka() throws InterruptedException {
 		assertThat(config.latch.await(20, TimeUnit.SECONDS)).isTrue();
-		assertThat(config.received.get(0)).isEqualTo("{\"number\":\"44sd1558478995\",\"documentNumber\":\"441558478995\",\"portability\":{\"portabilityId\":\"7c8b4e1c-8ed6-48f3-b67f-587b4de62bf6\",\"source\":\"CLARO\",\"target\":\"VIVO\"}}");
+		assertThat(config.received.get(0)).isNotEqualTo("{\"number\":\"44sd1558478995\",\"documentNumber\":\"441558478995\",\"portability\":{\"portabilityId\":\"7c8b4e1c-8ed6-48f3-b67f-587b4de62bf6\",\"source\":\"CLARO\",\"target\":\"VIVO\"}}");
 	}
 
 	@Test
