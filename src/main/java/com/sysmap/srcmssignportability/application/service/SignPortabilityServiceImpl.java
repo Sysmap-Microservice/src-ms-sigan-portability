@@ -8,6 +8,9 @@ import com.sysmap.srcmssignportability.domain.enums.CellPhoneOperator;
 import com.sysmap.srcmssignportability.domain.enums.StatusPortability;
 import com.sysmap.srcmssignportability.framework.adapters.in.dto.PortabilityInputKafka;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+
+import java.util.UUID;
 
 @Slf4j
 public class SignPortabilityServiceImpl implements SignPortabilityService {
@@ -20,22 +23,26 @@ public class SignPortabilityServiceImpl implements SignPortabilityService {
     }
 
     @Override
-    public Portability savePortabilityInfo(String messageKafka) {
+    public HttpStatus savePortabilityInfo(String messageKafka) {
 
-        var portabilityInputKafka = preparePortabilityForSaving(messageKafka);
+        try{
+            var portabilityInputKafka = preparePortabilityForSaving(messageKafka);
+            var request = Portability.builder()
+                    .documentNumber(portabilityInputKafka.getDocumentNumber())
+                    .number(portabilityInputKafka.getNumber())
+                    .target(portabilityInputKafka.getPortability().getTarget())
+                    .portabilityId(portabilityInputKafka.getPortability().getPortabilityId())
+                    .source(portabilityInputKafka.getPortability().getSource())
+                    .status(statusPortability)
+                    .build();
 
-        var request = Portability.builder()
-                .documentNumber(portabilityInputKafka.getDocumentNumber())
-                .number(portabilityInputKafka.getNumber())
-                .target(portabilityInputKafka.getPortability().getTarget())
-                .portabilityId(portabilityInputKafka.getPortability().getPortabilityId())
-                .source(portabilityInputKafka.getPortability().getSource())
-                .status(statusPortability)
-                .build();
+            portabilityRepository.savePortability(request);
+            return HttpStatus.CREATED;
 
-        portabilityRepository.savePortability(request);
-
-        return request;
+        }catch (Exception e){
+            System.out.println(e);
+            return HttpStatus.INTERNAL_SERVER_ERROR;
+        }
     }
 
     public PortabilityInputKafka preparePortabilityForSaving(String messageKafka) {
