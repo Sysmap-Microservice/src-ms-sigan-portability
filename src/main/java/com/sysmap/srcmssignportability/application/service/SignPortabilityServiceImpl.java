@@ -56,12 +56,12 @@ public class SignPortabilityServiceImpl implements SignPortabilityService {
         var portabilityInputKafka = gson
                 .fromJson(messageKafka, PortabilityInputKafka.class);
 
-        statusPortability = validadeIfPorted(portabilityInputKafka);
+        statusPortability = validateIfPorted(portabilityInputKafka);
 
         return portabilityInputKafka;
     }
 
-    private StatusPortability validadeIfPorted(PortabilityInputKafka portabilityInputKafka) {
+    private StatusPortability validateIfPorted(PortabilityInputKafka portabilityInputKafka) {
 
         if (portabilityInputKafka.getNumber().length() == 9
                 && portabilityInputKafka.getPortability().getSource().equals(CellPhoneOperator.VIVO)
