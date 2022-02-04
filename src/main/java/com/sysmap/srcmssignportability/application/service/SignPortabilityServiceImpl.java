@@ -6,20 +6,30 @@ import com.sysmap.srcmssignportability.application.ports.out.PortabilityReposito
 import com.sysmap.srcmssignportability.domain.entities.Portability;
 import com.sysmap.srcmssignportability.domain.enums.CellPhoneOperator;
 import com.sysmap.srcmssignportability.domain.enums.StatusPortability;
+import com.sysmap.srcmssignportability.domain.exceptions.CallbackNotFound;
+import com.sysmap.srcmssignportability.framework.adapters.in.dto.InputPutStatus;
 import com.sysmap.srcmssignportability.framework.adapters.in.dto.PortabilityInputKafka;
+import com.sysmap.srcmssignportability.framework.interfaces.client.PortabilityFeignClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 
 import java.util.UUID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Slf4j
 public class SignPortabilityServiceImpl implements SignPortabilityService {
 
+    private static Logger logger = LoggerFactory.getLogger(SignPortabilityServiceImpl.class);
+    private final String message = "SignPortability: A portabilidade foi concluida com sucesso!";
+
+    private final PortabilityFeignClient portabilityFeignClient;
     private final PortabilityRepository portabilityRepository;
     private StatusPortability statusPortability = StatusPortability.UNPORTED;
 
-    public SignPortabilityServiceImpl(PortabilityRepository portabilityRepository) {
+    public SignPortabilityServiceImpl(PortabilityRepository portabilityRepository, PortabilityFeignClient portabilityFeignClient) {
         this.portabilityRepository = portabilityRepository;
+        this.portabilityFeignClient = portabilityFeignClient;
     }
 
     @Override
@@ -53,6 +63,10 @@ public class SignPortabilityServiceImpl implements SignPortabilityService {
         statusPortability = validadeIfPorted(portabilityInputKafka);
 
         return portabilityInputKafka;
+
+        portabilityRepository.savePortability(request);
+        callback(request);
+
     }
 
     private StatusPortability validadeIfPorted(PortabilityInputKafka portabilityInputKafka) {
@@ -69,4 +83,18 @@ public class SignPortabilityServiceImpl implements SignPortabilityService {
     public StatusPortability getStatusPortability() {
         return this.statusPortability;
     }
+    public void callback(Portability request) {
+        InputPutStatus inputPutStatus = new InputPutStatus();
+        inputPutStatus.setStatus(request.getStatus());
+
+        logger.info("Enviando Callback.");
+        var responseDefaultDto = portabilityFeignClient.putStatusPortability(inputPutStatus, request.getPortabilityId(), message).getBody();
+        if(responseDefaultDto.isEmpty()){
+            logger.error("Falha ao enviar um callback!");
+            throw new CallbackNotFound("Falha ao enviar um callback!");
+        }
+        logger.info("Callback enviado.");
+        logger.info(responseDefaultDto);
+    }
+
 }
