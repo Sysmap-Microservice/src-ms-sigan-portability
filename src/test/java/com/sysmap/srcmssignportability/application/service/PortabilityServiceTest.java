@@ -5,7 +5,6 @@ import com.sysmap.srcmssignportability.application.ports.out.PortabilityReposito
 import com.sysmap.srcmssignportability.domain.entities.Portability;
 import com.sysmap.srcmssignportability.domain.enums.CellPhoneOperator;
 import com.sysmap.srcmssignportability.domain.enums.StatusPortability;
-import com.sysmap.srcmssignportability.framework.adapters.in.dto.InputPutStatus;
 import com.sysmap.srcmssignportability.framework.interfaces.client.PortabilityFeignClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,10 +12,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-
 import java.util.UUID;
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -53,7 +49,7 @@ public class PortabilityServiceTest {
         .source(CellPhoneOperator.CLARO)
         .status(StatusPortability.UNPORTED)
         .build();
-    
+
     @Test
     public void shouldNotSavePortabilityInfo() {
         when(portabilityRepository.savePortability(portabilityWrongStructure)).thenReturn(Mockito.any());
