@@ -13,7 +13,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+
 import java.util.UUID;
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -24,7 +27,6 @@ public class PortabilityServiceTest {
 
     private SignPortabilityService signPortabilityService;
     private UUID portabilityId = UUID.fromString("b5e1a821-a637-4a3a-b207-01b9f09abc7a");
-    private InputPutStatus inputPutStatus = new InputPutStatus();
 
     @Mock
     private PortabilityRepository portabilityRepository;
@@ -51,7 +53,7 @@ public class PortabilityServiceTest {
         .source(CellPhoneOperator.CLARO)
         .status(StatusPortability.UNPORTED)
         .build();
-
+    
     @Test
     public void shouldNotSavePortabilityInfo() {
         when(portabilityRepository.savePortability(portabilityWrongStructure)).thenReturn(Mockito.any());
