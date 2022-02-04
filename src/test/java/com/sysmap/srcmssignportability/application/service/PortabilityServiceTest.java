@@ -38,13 +38,13 @@ public class PortabilityServiceTest {
         signPortabilityServiceImpl = new SignPortabilityServiceImpl(portabilityRepository);
     }
 
-    Portability portabilityWrongStructure = Portability.builder()
+    private Portability portabilityWrongStructure = Portability.builder()
             .status(StatusPortability.PORTED)
             .target(CellPhoneOperator.CLARO)
             .source(CellPhoneOperator.VIVO)
             .build();
 
-    Portability portabilityRightStructure = Portability.builder()
+    private Portability portabilityRightStructure = Portability.builder()
         .documentNumber("441558478995")
         .number("931313434")
         .target(CellPhoneOperator.VIVO)
@@ -67,12 +67,12 @@ public class PortabilityServiceTest {
         assertEquals(HttpStatus.CREATED.value(), httpStatus.value());
     }
 
-//    @Test
-//    public void shouldNotSavePortabilityInfoWrongMessageKafka() {
-//        when(portabilityRepository.savePortability(portabilityRightStructure)).thenReturn(Mockito.any());
-//        HttpStatus httpStatus = signPortabilityService.savePortabilityInfo("{\"documentNumber\":\"441558478995\",\"portability\":{\"portabilityId\":\"b5e1a821-a637-4a3a-b207-01b9f09abc7a\",\"source\":\"CLARO\",\"target\":\"VIVO\"}}");
-//        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), httpStatus.value());
-//    }
+    @Test
+    public void shouldNotSavePortabilityInfoWrongMessageKafka() {
+        assertThrows(NullPointerException.class, () -> {
+            signPortabilityService.savePortabilityInfo("{\"documentNumber\":\"441558478995\",\"portability\":{\"portabilityId\":\"b5e1a821-a637-4a3a-b207-01b9f09abc7a\",\"source\":\"CLARO\",\"target\":\"VIVO\"}}");
+        });
+    }
 
     @Test
     public void testRuleForTheGetTheStatusPortabilityWhenPassedWrongSource(){

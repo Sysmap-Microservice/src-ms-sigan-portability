@@ -25,22 +25,21 @@ public class SignPortabilityServiceImpl implements SignPortabilityService {
     @Override
     public HttpStatus savePortabilityInfo(String messageKafka) {
 
-        try{
-            var portabilityInputKafka = preparePortabilityForSaving(messageKafka);
-            var request = Portability.builder()
-                    .documentNumber(portabilityInputKafka.getDocumentNumber())
-                    .number(portabilityInputKafka.getNumber())
-                    .target(portabilityInputKafka.getPortability().getTarget())
-                    .portabilityId(portabilityInputKafka.getPortability().getPortabilityId())
-                    .source(portabilityInputKafka.getPortability().getSource())
-                    .status(statusPortability)
-                    .build();
 
+        var portabilityInputKafka = preparePortabilityForSaving(messageKafka);
+        var request = Portability.builder()
+                .documentNumber(portabilityInputKafka.getDocumentNumber())
+                .number(portabilityInputKafka.getNumber())
+                .target(portabilityInputKafka.getPortability().getTarget())
+                .portabilityId(portabilityInputKafka.getPortability().getPortabilityId())
+                .source(portabilityInputKafka.getPortability().getSource())
+                .status(statusPortability)
+                .build();
+        try{
             portabilityRepository.savePortability(request);
             return HttpStatus.CREATED;
-
         }catch (Exception e){
-            System.out.println(e);
+            //System.out.println(e);
             return HttpStatus.INTERNAL_SERVER_ERROR;
         }
     }
