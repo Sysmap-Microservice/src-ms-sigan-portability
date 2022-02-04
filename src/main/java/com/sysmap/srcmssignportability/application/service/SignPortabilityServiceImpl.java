@@ -12,8 +12,6 @@ import com.sysmap.srcmssignportability.framework.adapters.in.dto.PortabilityInpu
 import com.sysmap.srcmssignportability.framework.interfaces.client.PortabilityFeignClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-
-import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,7 +20,6 @@ public class SignPortabilityServiceImpl implements SignPortabilityService {
 
     private static Logger logger = LoggerFactory.getLogger(SignPortabilityServiceImpl.class);
     private final String message = "SignPortability: A portabilidade foi concluida com sucesso!";
-
     private final PortabilityFeignClient portabilityFeignClient;
     private final PortabilityRepository portabilityRepository;
     private StatusPortability statusPortability = StatusPortability.UNPORTED;
@@ -34,8 +31,6 @@ public class SignPortabilityServiceImpl implements SignPortabilityService {
 
     @Override
     public HttpStatus savePortabilityInfo(String messageKafka) {
-
-
         var portabilityInputKafka = preparePortabilityForSaving(messageKafka);
         var request = Portability.builder()
                 .documentNumber(portabilityInputKafka.getDocumentNumber())
@@ -47,9 +42,10 @@ public class SignPortabilityServiceImpl implements SignPortabilityService {
                 .build();
         try{
             portabilityRepository.savePortability(request);
+            callback(request);
             return HttpStatus.CREATED;
         }catch (Exception e){
-            //System.out.println(e);
+            System.out.println(e);
             return HttpStatus.INTERNAL_SERVER_ERROR;
         }
     }
@@ -63,10 +59,6 @@ public class SignPortabilityServiceImpl implements SignPortabilityService {
         statusPortability = validadeIfPorted(portabilityInputKafka);
 
         return portabilityInputKafka;
-
-        portabilityRepository.savePortability(request);
-        callback(request);
-
     }
 
     private StatusPortability validadeIfPorted(PortabilityInputKafka portabilityInputKafka) {
@@ -83,18 +75,22 @@ public class SignPortabilityServiceImpl implements SignPortabilityService {
     public StatusPortability getStatusPortability() {
         return this.statusPortability;
     }
+
     public void callback(Portability request) {
+
         InputPutStatus inputPutStatus = new InputPutStatus();
         inputPutStatus.setStatus(request.getStatus());
 
-        logger.info("Enviando Callback.");
-        var responseDefaultDto = portabilityFeignClient.putStatusPortability(inputPutStatus, request.getPortabilityId(), message).getBody();
-        if(responseDefaultDto.isEmpty()){
-            logger.error("Falha ao enviar um callback!");
-            throw new CallbackNotFound("Falha ao enviar um callback!");
-        }
-        logger.info("Callback enviado.");
-        logger.info(responseDefaultDto);
-    }
+        if (portabilityFeignClient.putStatusPortability(inputPutStatus, request.getPortabilityId(), message) != null) {
 
+            logger.info("Enviando Callback.");
+            var responseDefaultDto = portabilityFeignClient.putStatusPortability(inputPutStatus, request.getPortabilityId(), message).getBody();
+            if (responseDefaultDto.isEmpty()) {
+                logger.error("Falha ao enviar um callback!");
+                throw new CallbackNotFound("Falha ao enviar um callback!");
+            }
+            logger.info("Callback enviado.");
+            logger.info(responseDefaultDto);
+        }
+    }
 }
