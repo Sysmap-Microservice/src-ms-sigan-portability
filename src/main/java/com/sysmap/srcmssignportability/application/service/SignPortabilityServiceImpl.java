@@ -18,8 +18,7 @@ import org.slf4j.LoggerFactory;
 @Slf4j
 public class SignPortabilityServiceImpl implements SignPortabilityService {
 
-    private static Logger logger = LoggerFactory.getLogger(SignPortabilityServiceImpl.class);
-    private final String message = "SignPortability: A portabilidade foi concluida com sucesso!";
+    private static final Logger LOGGER = LoggerFactory.getLogger(SignPortabilityServiceImpl.class);
     private final PortabilityFeignClient portabilityFeignClient;
     private final PortabilityRepository portabilityRepository;
     private StatusPortability statusPortability = StatusPortability.UNPORTED;
@@ -81,16 +80,17 @@ public class SignPortabilityServiceImpl implements SignPortabilityService {
         InputPutStatus inputPutStatus = new InputPutStatus();
         inputPutStatus.setStatus(request.getStatus());
 
+        String message = "SignPortability: A portabilidade foi concluida com sucesso!";
         if (portabilityFeignClient.putStatusPortability(inputPutStatus, request.getPortabilityId(), message) != null) {
 
-            logger.info("Enviando Callback.");
+            LOGGER.info("Enviando Callback.");
             var responseDefaultDto = portabilityFeignClient.putStatusPortability(inputPutStatus, request.getPortabilityId(), message).getBody();
-            if (responseDefaultDto.isEmpty()) {
-                logger.error("Falha ao enviar um callback!");
+            if (responseDefaultDto == null) {
+                LOGGER.error("Falha ao enviar um callback!");
                 throw new CallbackNotFound("Falha ao enviar um callback!");
             }
-            logger.info("Callback enviado.");
-            logger.info(responseDefaultDto);
+            LOGGER.info("Callback enviado.");
+            LOGGER.info(responseDefaultDto);
         }
     }
 }
