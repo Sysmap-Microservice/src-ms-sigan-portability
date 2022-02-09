@@ -4,7 +4,6 @@ import com.sysmap.srcmssignportability.application.ports.in.SignPortabilityServi
 import com.sysmap.srcmssignportability.application.ports.out.PortabilityRepository;
 import com.sysmap.srcmssignportability.domain.entities.Portability;
 import com.sysmap.srcmssignportability.domain.enums.CellPhoneOperator;
-import com.sysmap.srcmssignportability.domain.enums.HttpStatusSimulator;
 import com.sysmap.srcmssignportability.domain.enums.StatusPortability;
 import com.sysmap.srcmssignportability.framework.interfaces.client.PortabilityFeignClient;
 import org.junit.jupiter.api.BeforeEach;
@@ -53,9 +52,9 @@ public class PortabilityServiceTest {
 
     private void insertIntoValidationForTestsCorrectValue(Boolean resp) {
         if (resp == true)
-            this.validationForTests = HttpStatusSimulator.CREATED.toString();
+            this.validationForTests = "CREATED";
         else
-            this.validationForTests = HttpStatusSimulator.INTERNAL_SERVER_ERROR.toString();
+            this.validationForTests = "INTERNAL_SERVER_ERROR";
     }
 
     @Test
@@ -63,7 +62,7 @@ public class PortabilityServiceTest {
         when(portabilityRepository.savePortability(portabilityWrongStructure)).thenReturn(Mockito.any());
         Boolean resp = signPortabilityService.savePortabilityInfo("{\"number\":\"931313434\",\"documentNumber\":\"441558478995\",\"portability\":{\"portabilityId\":\"b5e1a821-a637-4a3a-b207-01b9f09abc7a\",\"source\":\"CLARO\",\"target\":\"VIVO\"}}");
         insertIntoValidationForTestsCorrectValue(resp);
-        assertEquals(this.validationForTests, HttpStatusSimulator.INTERNAL_SERVER_ERROR.toString());
+        assertEquals(this.validationForTests, "INTERNAL_SERVER_ERROR");
     }
 
     @Test
@@ -71,7 +70,7 @@ public class PortabilityServiceTest {
         when(portabilityRepository.savePortability(portabilityRightStructure)).thenReturn(Mockito.any());
         Boolean resp = signPortabilityService.savePortabilityInfo("{\"number\":\"931313434\",\"documentNumber\":\"441558478995\",\"portability\":{\"portabilityId\":\"b5e1a821-a637-4a3a-b207-01b9f09abc7a\",\"source\":\"CLARO\",\"target\":\"VIVO\"}}");
         insertIntoValidationForTestsCorrectValue(resp);
-        assertEquals(this.validationForTests, HttpStatusSimulator.CREATED.toString());
+        assertEquals(this.validationForTests, "CREATED");
     }
 
     @Test
