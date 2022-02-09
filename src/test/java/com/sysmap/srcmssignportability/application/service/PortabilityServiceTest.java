@@ -4,6 +4,7 @@ import com.sysmap.srcmssignportability.application.ports.in.SignPortabilityServi
 import com.sysmap.srcmssignportability.application.ports.out.PortabilityRepository;
 import com.sysmap.srcmssignportability.domain.entities.Portability;
 import com.sysmap.srcmssignportability.domain.enums.CellPhoneOperator;
+import com.sysmap.srcmssignportability.domain.enums.HttpStatusSimulator;
 import com.sysmap.srcmssignportability.domain.enums.StatusPortability;
 import com.sysmap.srcmssignportability.framework.interfaces.client.PortabilityFeignClient;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,7 +13,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
 import java.util.UUID;
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -23,6 +23,7 @@ public class PortabilityServiceTest {
 
     private SignPortabilityService signPortabilityService;
     private UUID portabilityId = UUID.fromString("b5e1a821-a637-4a3a-b207-01b9f09abc7a");
+    private String validationForTests;
 
     @Mock
     private PortabilityRepository portabilityRepository;
@@ -50,18 +51,27 @@ public class PortabilityServiceTest {
         .status(StatusPortability.UNPORTED)
         .build();
 
+    private void insertIntoValidationForTestsCorrectValue(Boolean resp) {
+        if (resp == true)
+            this.validationForTests = HttpStatusSimulator.CREATED.toString();
+        else
+            this.validationForTests = HttpStatusSimulator.INTERNAL_SERVER_ERROR.toString();
+    }
+
     @Test
     public void shouldNotSavePortabilityInfo() {
         when(portabilityRepository.savePortability(portabilityWrongStructure)).thenReturn(Mockito.any());
-        HttpStatus httpStatus = signPortabilityService.savePortabilityInfo("{\"number\":\"931313434\",\"documentNumber\":\"441558478995\",\"portability\":{\"portabilityId\":\"b5e1a821-a637-4a3a-b207-01b9f09abc7a\",\"source\":\"CLARO\",\"target\":\"VIVO\"}}");
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), httpStatus.value());
+        Boolean resp = signPortabilityService.savePortabilityInfo("{\"number\":\"931313434\",\"documentNumber\":\"441558478995\",\"portability\":{\"portabilityId\":\"b5e1a821-a637-4a3a-b207-01b9f09abc7a\",\"source\":\"CLARO\",\"target\":\"VIVO\"}}");
+        insertIntoValidationForTestsCorrectValue(resp);
+        assertEquals(this.validationForTests, HttpStatusSimulator.INTERNAL_SERVER_ERROR.toString());
     }
 
     @Test
     public void shouldSavePortabilityInfo() {
         when(portabilityRepository.savePortability(portabilityRightStructure)).thenReturn(Mockito.any());
-        HttpStatus httpStatus = signPortabilityService.savePortabilityInfo("{\"number\":\"931313434\",\"documentNumber\":\"441558478995\",\"portability\":{\"portabilityId\":\"b5e1a821-a637-4a3a-b207-01b9f09abc7a\",\"source\":\"CLARO\",\"target\":\"VIVO\"}}");
-        assertEquals(HttpStatus.CREATED.value(), httpStatus.value());
+        Boolean resp = signPortabilityService.savePortabilityInfo("{\"number\":\"931313434\",\"documentNumber\":\"441558478995\",\"portability\":{\"portabilityId\":\"b5e1a821-a637-4a3a-b207-01b9f09abc7a\",\"source\":\"CLARO\",\"target\":\"VIVO\"}}");
+        insertIntoValidationForTestsCorrectValue(resp);
+        assertEquals(this.validationForTests, HttpStatusSimulator.CREATED.toString());
     }
 
     @Test

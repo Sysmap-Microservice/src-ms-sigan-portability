@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 
 public interface SignPortabilityService {
 
-    HttpStatus savePortabilityInfo(String messageKafka);
+    Boolean savePortabilityInfo(String messageKafka);
     StatusPortability getStatusPortability();
     PortabilityInputKafka preparePortabilityForSaving(String messageKafka);
 }

@@ -11,7 +11,6 @@ import com.sysmap.srcmssignportability.framework.adapters.in.dto.InputPutStatus;
 import com.sysmap.srcmssignportability.framework.adapters.in.dto.PortabilityInputKafka;
 import com.sysmap.srcmssignportability.framework.interfaces.client.PortabilityFeignClient;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +28,7 @@ public class SignPortabilityServiceImpl implements SignPortabilityService {
     }
 
     @Override
-    public HttpStatus savePortabilityInfo(String messageKafka) {
+    public Boolean savePortabilityInfo(String messageKafka) {
         var portabilityInputKafka = preparePortabilityForSaving(messageKafka);
         var request = Portability.builder()
                 .documentNumber(portabilityInputKafka.getDocumentNumber())
@@ -42,10 +41,10 @@ public class SignPortabilityServiceImpl implements SignPortabilityService {
         try{
             portabilityRepository.savePortability(request);
             callback(request);
-            return HttpStatus.CREATED;
+            return true;
         }catch (Exception e){
-            System.out.println(e);
-            return HttpStatus.INTERNAL_SERVER_ERROR;
+            //System.out.println(e);
+            return false;
         }
     }
 
