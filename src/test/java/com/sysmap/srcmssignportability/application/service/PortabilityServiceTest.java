@@ -51,7 +51,7 @@ public class PortabilityServiceTest {
         .build();
 
     private void insertIntoValidationForTestsCorrectValue(Boolean resp) {
-        if (resp == true)
+        if (resp)
             this.validationForTests = "CREATED";
         else
             this.validationForTests = "INTERNAL_SERVER_ERROR";
