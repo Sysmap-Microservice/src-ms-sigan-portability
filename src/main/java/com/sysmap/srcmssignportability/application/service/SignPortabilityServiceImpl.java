@@ -13,6 +13,7 @@ import com.sysmap.srcmssignportability.framework.interfaces.client.PortabilityFe
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
 
 @Slf4j
 public class SignPortabilityServiceImpl implements SignPortabilityService {
@@ -28,9 +29,11 @@ public class SignPortabilityServiceImpl implements SignPortabilityService {
     }
 
     @Override
-    public StatusPortability savePortabilityInfo(String messageKafka) {
-        var portabilityInputKafka = preparePortabilityForSaving(messageKafka);
-        var request = Portability.builder()
+    public void savePortabilityInfo(String messageKafka) {
+        var portabilityInputKafka = getPortabilityInputKafkaFromMessageKafka(messageKafka);
+        statusPortability = validateIfCanBePorted(portabilityInputKafka);
+
+        var portability = Portability.builder()
                 .documentNumber(portabilityInputKafka.getDocumentNumber())
                 .number(portabilityInputKafka.getNumber())
                 .target(portabilityInputKafka.getPortability().getTarget())
@@ -39,23 +42,22 @@ public class SignPortabilityServiceImpl implements SignPortabilityService {
                 .status(statusPortability)
                 .build();
 
-        portabilityRepository.savePortability(request);
-        callback(request);
+        portabilityRepository.savePortability(portability);
+        callback(portability);
+
+    }
+
+    @Override
+    public StatusPortability getStatusPortability() {
         return this.statusPortability;
     }
 
-    public PortabilityInputKafka preparePortabilityForSaving(String messageKafka) {
-        Gson gson = new Gson();
-
-        var portabilityInputKafka = gson
-                .fromJson(messageKafka, PortabilityInputKafka.class);
-
-        statusPortability = validateIfPorted(portabilityInputKafka);
-
-        return portabilityInputKafka;
+    private PortabilityInputKafka getPortabilityInputKafkaFromMessageKafka(String messageKafka) {
+        var gson = new Gson();
+        return gson.fromJson(messageKafka, PortabilityInputKafka.class);
     }
 
-    private StatusPortability validateIfPorted(PortabilityInputKafka portabilityInputKafka) {
+    private StatusPortability validateIfCanBePorted(PortabilityInputKafka portabilityInputKafka) {
 
         if (portabilityInputKafka.getNumber().length() == 9
                 && portabilityInputKafka.getPortability().getSource().equals(CellPhoneOperator.VIVO)
@@ -66,26 +68,22 @@ public class SignPortabilityServiceImpl implements SignPortabilityService {
         return statusPortability;
     }
 
-    public StatusPortability getStatusPortability() {
-        return this.statusPortability;
-    }
+    public void callback(Portability portability) {
+        var message = "SignPortability: A portabilidade " + portability.getPortabilityId() + " foi concluida com sucesso!";
+        var inputPutStatus = new InputPutStatus();
+        inputPutStatus.setStatus(portability.getStatus());
 
-    public void callback(Portability request) {
-
-        InputPutStatus inputPutStatus = new InputPutStatus();
-        inputPutStatus.setStatus(request.getStatus());
-
-        String message = "SignPortability: A portabilidade foi concluida com sucesso!";
-        if (portabilityFeignClient.putStatusPortability(inputPutStatus, request.getPortabilityId(), message) != null) {
-
+        try {
             LOGGER.info("Enviando Callback.");
-            var responseDefaultDto = portabilityFeignClient.putStatusPortability(inputPutStatus, request.getPortabilityId(), message).getBody();
-            if (responseDefaultDto == null) {
-                LOGGER.error("Falha ao enviar um callback!");
-                throw new CallbackNotFound("Falha ao enviar um callback!");
-            }
-            LOGGER.info("Callback enviado.");
-            LOGGER.info(responseDefaultDto);
+            ResponseEntity<String> returned = portabilityFeignClient.putStatusPortability(inputPutStatus, portability.getPortabilityId(), message);
+            LOGGER.info("Callback de atualização do status enviado.");
+            LOGGER.info(returned.getBody());
+
+        } catch (Exception e) {
+            LOGGER.error("Falha ao enviar um callback!");
+            throw new CallbackNotFound("Falha ao enviar o callback de atualização do status!");
         }
+
     }
+
 }
