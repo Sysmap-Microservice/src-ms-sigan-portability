@@ -2,27 +2,20 @@ package com.sysmap.srcmssignportability.application.service;
 
 import com.sysmap.srcmssignportability.application.ports.in.SignPortabilityService;
 import com.sysmap.srcmssignportability.application.ports.out.PortabilityRepository;
-import com.sysmap.srcmssignportability.domain.entities.Portability;
-import com.sysmap.srcmssignportability.domain.enums.CellPhoneOperator;
 import com.sysmap.srcmssignportability.domain.enums.StatusPortability;
 import com.sysmap.srcmssignportability.framework.interfaces.client.PortabilityFeignClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import java.util.UUID;
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class PortabilityServiceTest {
 
     private SignPortabilityService signPortabilityService;
-    private UUID portabilityId = UUID.fromString("b5e1a821-a637-4a3a-b207-01b9f09abc7a");
-    private String validationForTests;
 
     @Mock
     private PortabilityRepository portabilityRepository;
@@ -35,42 +28,19 @@ public class PortabilityServiceTest {
         signPortabilityService = new SignPortabilityServiceImpl(portabilityRepository, portabilityFeignClient);
     }
 
-    private Portability portabilityWrongStructure = Portability.builder()
-            .status(StatusPortability.PORTED)
-            .target(CellPhoneOperator.CLARO)
-            .source(CellPhoneOperator.VIVO)
-            .build();
-
-    private Portability portabilityRightStructure = Portability.builder()
-        .documentNumber("441558478995")
-        .number("931313434")
-        .target(CellPhoneOperator.VIVO)
-        .portabilityId(portabilityId)
-        .source(CellPhoneOperator.CLARO)
-        .status(StatusPortability.UNPORTED)
-        .build();
-
-    private void insertIntoValidationForTestsCorrectValue(Boolean resp) {
-        if (resp)
-            this.validationForTests = "CREATED";
-        else
-            this.validationForTests = "INTERNAL_SERVER_ERROR";
-    }
-
     @Test
     public void shouldNotSavePortabilityInfo() {
-        when(portabilityRepository.savePortability(portabilityWrongStructure)).thenReturn(Mockito.any());
-        Boolean resp = signPortabilityService.savePortabilityInfo("{\"number\":\"931313434\",\"documentNumber\":\"441558478995\",\"portability\":{\"portabilityId\":\"b5e1a821-a637-4a3a-b207-01b9f09abc7a\",\"source\":\"CLARO\",\"target\":\"VIVO\"}}");
-        insertIntoValidationForTestsCorrectValue(resp);
-        assertEquals(this.validationForTests, "INTERNAL_SERVER_ERROR");
+        assertEquals(StatusPortability.UNPORTED, signPortabilityService.savePortabilityInfo("{\"number\":\"931313434\",\"documentNumber\":\"441558478995\",\"portability\":{\"portabilityId\":\"b5e1a821-a637-4a3a-b207-01b9f09abc7a\",\"source\":\"CLARO\",\"target\":\"VIVO\"}}"));
     }
 
     @Test
     public void shouldSavePortabilityInfo() {
-        when(portabilityRepository.savePortability(portabilityRightStructure)).thenReturn(Mockito.any());
-        Boolean resp = signPortabilityService.savePortabilityInfo("{\"number\":\"931313434\",\"documentNumber\":\"441558478995\",\"portability\":{\"portabilityId\":\"b5e1a821-a637-4a3a-b207-01b9f09abc7a\",\"source\":\"CLARO\",\"target\":\"VIVO\"}}");
-        insertIntoValidationForTestsCorrectValue(resp);
-        assertEquals(this.validationForTests, "CREATED");
+        assertEquals(StatusPortability.PORTED, signPortabilityService.savePortabilityInfo("{\"number\":\"931313434\",\"documentNumber\":\"441558478995\",\"portability\":{\"portabilityId\":\"b5e1a821-a637-4a3a-b207-01b9f09abc7a\",\"source\":\"VIVO\",\"target\":\"CLARO\"}}"));
+    }
+
+    @Test
+    public void shouldNotSavePortabilityInfoWithMoreThan9DigitsNumber() {
+        assertEquals(StatusPortability.UNPORTED, signPortabilityService.savePortabilityInfo("{\"number\":\"9313134340\",\"documentNumber\":\"441558478995\",\"portability\":{\"portabilityId\":\"b5e1a821-a637-4a3a-b207-01b9f09abc7a\",\"source\":\"VIVO\",\"target\":\"CLARO\"}}"));
     }
 
     @Test

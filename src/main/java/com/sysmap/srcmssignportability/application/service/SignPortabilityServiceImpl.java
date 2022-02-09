@@ -28,7 +28,7 @@ public class SignPortabilityServiceImpl implements SignPortabilityService {
     }
 
     @Override
-    public Boolean savePortabilityInfo(String messageKafka) {
+    public StatusPortability savePortabilityInfo(String messageKafka) {
         var portabilityInputKafka = preparePortabilityForSaving(messageKafka);
         var request = Portability.builder()
                 .documentNumber(portabilityInputKafka.getDocumentNumber())
@@ -38,14 +38,10 @@ public class SignPortabilityServiceImpl implements SignPortabilityService {
                 .source(portabilityInputKafka.getPortability().getSource())
                 .status(statusPortability)
                 .build();
-        try{
-            portabilityRepository.savePortability(request);
-            callback(request);
-            return true;
-        }catch (Exception e){
-            //System.out.println(e);
-            return false;
-        }
+
+        portabilityRepository.savePortability(request);
+        callback(request);
+        return this.statusPortability;
     }
 
     public PortabilityInputKafka preparePortabilityForSaving(String messageKafka) {
