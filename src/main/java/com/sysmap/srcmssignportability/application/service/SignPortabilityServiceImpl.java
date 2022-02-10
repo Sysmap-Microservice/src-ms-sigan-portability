@@ -13,7 +13,6 @@ import com.sysmap.srcmssignportability.framework.interfaces.client.PortabilityFe
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.ResponseEntity;
 
 @Slf4j
 public class SignPortabilityServiceImpl implements SignPortabilityService {
@@ -75,7 +74,7 @@ public class SignPortabilityServiceImpl implements SignPortabilityService {
 
         try {
             LOGGER.info("Enviando Callback.");
-            ResponseEntity<String> returned = portabilityFeignClient.putStatusPortability(inputPutStatus, portability.getPortabilityId(), message);
+            var returned = portabilityFeignClient.putStatusPortability(inputPutStatus, portability.getPortabilityId(), message);
             LOGGER.info("Callback de atualização do status enviado.");
             LOGGER.info(returned.getBody());
 
