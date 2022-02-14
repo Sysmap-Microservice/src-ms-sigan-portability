@@ -14,6 +14,5 @@ import java.util.UUID;
 public interface PortabilityFeignClient {
 
     @PutMapping("/portability/{portabilityId}")
-    ResponseEntity<String> putStatusPortability(@RequestBody InputPutStatus inputPutStatus,
-                                              @PathVariable UUID portabilityId, @RequestParam("message") String message);
+    ResponseEntity<String> putStatusPortability(@RequestBody InputPutStatus inputPutStatus, @PathVariable UUID portabilityId);
 }

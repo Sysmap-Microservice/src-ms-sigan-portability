@@ -36,7 +36,7 @@ public class SignPortabilityServiceTest {
 
     @Test
     public void shouldSavePortability() {
-        when(portabilityFeignClient.putStatusPortability(any(), any(), any())).thenReturn(ResponseEntity.ok("Teste ok"));
+        when(portabilityFeignClient.putStatusPortability(any(), any())).thenReturn(ResponseEntity.ok("Teste ok"));
 
         var message = getKafkaMessage("998765432", CellPhoneOperator.VIVO, CellPhoneOperator.OI);
         signPortabilityService.savePortabilityInfo(message);
@@ -46,7 +46,7 @@ public class SignPortabilityServiceTest {
 
     @Test
     public void shouldNotSavePortabilityBecauseNumberSizeBiggerThanNine() {
-        when(portabilityFeignClient.putStatusPortability(any(), any(), any())).thenReturn(ResponseEntity.ok("Teste ok"));
+        when(portabilityFeignClient.putStatusPortability(any(), any())).thenReturn(ResponseEntity.ok("Teste ok"));
 
         var message = getKafkaMessage("9987654320", CellPhoneOperator.VIVO, CellPhoneOperator.TIM);
         signPortabilityService.savePortabilityInfo(message);
@@ -56,7 +56,7 @@ public class SignPortabilityServiceTest {
 
     @Test
     public void shouldNotSavePortabilityBecauseNumberSizeLessThanNine() {
-        when(portabilityFeignClient.putStatusPortability(any(), any(), any())).thenReturn(ResponseEntity.ok("Teste ok"));
+        when(portabilityFeignClient.putStatusPortability(any(), any())).thenReturn(ResponseEntity.ok("Teste ok"));
 
         var message = getKafkaMessage("99876543", CellPhoneOperator.VIVO, CellPhoneOperator.TIM);
         signPortabilityService.savePortabilityInfo(message);
@@ -66,7 +66,7 @@ public class SignPortabilityServiceTest {
 
     @Test
     public void shouldNotSavePortabilityBecauseSourceIsNotVIVO() {
-        when(portabilityFeignClient.putStatusPortability(any(), any(), any())).thenReturn(ResponseEntity.ok("Teste ok"));
+        when(portabilityFeignClient.putStatusPortability(any(), any())).thenReturn(ResponseEntity.ok("Teste ok"));
 
         var message = getKafkaMessage("998765432", CellPhoneOperator.CLARO, CellPhoneOperator.NEXTEL);
         signPortabilityService.savePortabilityInfo(message);
@@ -76,7 +76,7 @@ public class SignPortabilityServiceTest {
 
     @Test
     public void shouldNotSavePortabilityBecauseTargetIsVIVO() {
-        when(portabilityFeignClient.putStatusPortability(any(), any(), any())).thenReturn(ResponseEntity.ok("Teste ok"));
+        when(portabilityFeignClient.putStatusPortability(any(), any())).thenReturn(ResponseEntity.ok("Teste ok"));
 
         var message = getKafkaMessage("998765432", CellPhoneOperator.CLARO, CellPhoneOperator.VIVO);
         signPortabilityService.savePortabilityInfo(message);
@@ -86,7 +86,7 @@ public class SignPortabilityServiceTest {
 
     @Test
     public void shouldNotSavePortabilityBecauseTargetAndSourceIsEquals() {
-        when(portabilityFeignClient.putStatusPortability(any(), any(), any())).thenReturn(ResponseEntity.ok("Teste ok"));
+        when(portabilityFeignClient.putStatusPortability(any(), any())).thenReturn(ResponseEntity.ok("Teste ok"));
 
         var message = getKafkaMessage("998765432", CellPhoneOperator.VIVO, CellPhoneOperator.VIVO);
         signPortabilityService.savePortabilityInfo(message);
@@ -96,7 +96,7 @@ public class SignPortabilityServiceTest {
 
     @Test
     public void shouldThrowCallbackNotFoundException() {
-        when(portabilityFeignClient.putStatusPortability(any(), any(), any())).thenThrow(IllegalArgumentException.class);
+        when(portabilityFeignClient.putStatusPortability(any(), any())).thenThrow(IllegalArgumentException.class);
 
         var message = getKafkaMessage("998765432", CellPhoneOperator.VIVO, CellPhoneOperator.OI);
         assertThrows(CallbackNotFound.class, () -> signPortabilityService.savePortabilityInfo(message));
