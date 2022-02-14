@@ -68,13 +68,12 @@ public class SignPortabilityServiceImpl implements SignPortabilityService {
     }
 
     public void callback(Portability portability) {
-        var message = "SignPortability: A portabilidade " + portability.getPortabilityId() + " foi concluida com sucesso!";
         var inputPutStatus = new InputPutStatus();
         inputPutStatus.setStatus(portability.getStatus());
 
         try {
             LOGGER.info("Enviando Callback.");
-            var returned = portabilityFeignClient.putStatusPortability(inputPutStatus, portability.getPortabilityId(), message);
+            var returned = portabilityFeignClient.putStatusPortability(inputPutStatus, portability.getPortabilityId());
             LOGGER.info("Callback de atualização do status enviado.");
             LOGGER.info(returned.getBody());
 
