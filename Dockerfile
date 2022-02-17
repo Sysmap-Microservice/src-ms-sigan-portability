@@ -1,5 +1,8 @@
 FROM openjdk:17.0.2-jdk-oracle
+RUN mkdir app
 ARG JAR_FILE
-ADD target/${JAR_FILE} ${JAR_FILE}
-ENTRYPOINT ["java", "-jar", "target/${JAR_FILE}.jar"]
-EXPOSE 8081
+ADD /target/${JAR_FILE} /app/src-ms-sign-portability.jar
+WORKDIR /app
+ENTRYPOINT java -jar src-ms-sign-portability.jar
+EXPOSE 8085
+
