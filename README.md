@@ -10,7 +10,7 @@ If you want to run this project with an automated process (like CI/CD), put the 
 version: "3.4"
 
 services:
-  src-ms-portability:
+  src-ms-sign-portability:
     container_name: src-ms-sign-portability
     image: sysmapmsteam/src-ms-sign-portability:0.0.1-SNAPSHOT
     ports:
