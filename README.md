@@ -2,7 +2,7 @@
 
 ### Run the project image from DockerHub
 To run the image of this project from the DockerHub, run this comand in your command line (Terminal or CMD):
-> docker push sysmapmsteam/src-ms-sign-portability:tagname
+> docker push sysmapmsteam/src-ms-sign-portability:0.0.1-SNAPSHOT
 
 ### Run the project image from DockerHub with Docker Compose
 If you want to run this project with an automated process (like CI/CD), put the following code in your file named 'docker-compose.yaml':
