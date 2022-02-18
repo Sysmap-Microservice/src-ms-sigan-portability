@@ -43,7 +43,6 @@ public class SignPortabilityServiceImpl implements SignPortabilityService {
 
         portabilityRepository.savePortability(portability);
         callback(portability);
-
     }
 
     @Override
@@ -57,13 +56,11 @@ public class SignPortabilityServiceImpl implements SignPortabilityService {
     }
 
     private StatusPortability validateIfCanBePorted(PortabilityInputKafka portabilityInputKafka) {
-
         if (portabilityInputKafka.getNumber().length() == 9
                 && portabilityInputKafka.getPortability().getSource().equals(CellPhoneOperator.VIVO)
                 && !portabilityInputKafka.getPortability().getTarget().equals(CellPhoneOperator.VIVO)) {
             statusPortability = StatusPortability.PORTED;
         }
-
         return statusPortability;
     }
 
@@ -81,7 +78,5 @@ public class SignPortabilityServiceImpl implements SignPortabilityService {
             LOGGER.error("Falha ao enviar um callback!");
             throw new CallbackNotFound("Falha ao enviar o callback de atualização do status!");
         }
-
     }
-
 }

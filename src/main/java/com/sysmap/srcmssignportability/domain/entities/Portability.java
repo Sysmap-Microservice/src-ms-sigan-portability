@@ -12,17 +12,10 @@ import java.util.UUID;
 @Builder
 @Document
 public class Portability {
-
     private UUID portabilityId;
-
     private CellPhoneOperator source;
-
     private CellPhoneOperator target;
-
     private String number;
-
     private String documentNumber;
-
     private StatusPortability status;
-
 }
