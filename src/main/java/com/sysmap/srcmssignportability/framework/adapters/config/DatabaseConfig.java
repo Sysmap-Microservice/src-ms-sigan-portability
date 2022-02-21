@@ -22,7 +22,6 @@ public class DatabaseConfig {
                 .build();
 
         return MongoClients.create(mongoClientSettings);
-
     }
 
     @Bean
