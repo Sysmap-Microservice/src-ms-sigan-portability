@@ -21,7 +21,7 @@ public class KafkaConsumerServiceImpl implements KafkaConsumerService {
     @Value("${cloudkarafka.topic}")
     private String topicName;
 
-    @KafkaListener(topics = "${cloudkarafka.topic}")
+    @KafkaListener(topics = "${cloudkarafka.topic}", groupId = "portability-consumer")
     public void consume(ConsumerRecord<String, String> payload){
         log.info("Tópico: {}", topicName);
         log.info("key: {}", payload.key());
